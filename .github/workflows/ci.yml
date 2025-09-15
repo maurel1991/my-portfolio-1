@@ -1,0 +1,38 @@
+name: CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+ 
+jobs:
+  
+  build:
+   
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build image
+        run: |
+              docker build -t ${{secrets.USERNAME}}/portofolio:${{github.run_number}} .
+              docker build -t ${{secrets.USERNAME}}/portofolio .
+      - name: Push image
+        run: | 
+              docker login -u ${{secrets.USERNAME}} -p ${{secrets.REGISTRY_PASS}}
+              docker push ${{secrets.USERNAME}}/portofolio:${{github.run_number}}
+              docker push ${{secrets.USERNAME}}/portofolio
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: ssh to a server
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME1 }}
+          key: ${{ secrets.KEY }}
+          #port: ${{ secrets.PORT }}
+          script: |
+                    docker rm -f resume
+                    docker run -d --name resume -p 8080:5001 ${{secrets.USERNAME}}/portofolio:${{github.run_number}}

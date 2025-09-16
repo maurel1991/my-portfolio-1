@@ -26,10 +26,10 @@ jobs:
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v1
       
-      # - name: Build and Push Docker Image
-      #   run: |
-      #     IMAGE_URI="${{ steps.login-ecr.outputs.registry }}/portfolio"
-      #     docker build -t $IMAGE_URI:${{ github.run_number }} .
-      #     docker push $IMAGE_URI:${{ github.run_number }}
-      #     docker tag $IMAGE_URI:${{ github.run_number }} $IMAGE_URI:latest
-      #     docker push $IMAGE_URI:latest
+      - name: Build and Push Docker Image
+        run: |
+          IMAGE_URI="${{ steps.login-ecr.outputs.registry }}/portfolio"
+          docker build -t $IMAGE_URI:${{ github.run_number }} .
+          docker push $IMAGE_URI:${{ github.run_number }}
+          docker tag $IMAGE_URI:${{ github.run_number }} $IMAGE_URI:latest
+          docker push $IMAGE_URI:latest

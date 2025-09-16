@@ -1,38 +1,35 @@
-name: CI
+name: CI/CD Pipeline
 
 on:
   push:
     branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
- 
+
 jobs:
-  
   build:
-   
     runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
     steps:
-      - uses: actions/checkout@v4
-      - name: Build image
-        run: |
-              docker build -t ${{secrets.USERNAME}}/portofolio:${{github.run_number}} .
-              docker build -t ${{secrets.USERNAME}}/portofolio .
-      - name: Push image
-        run: | 
-              docker login -u ${{secrets.USERNAME}} -p ${{secrets.REGISTRY_PASS}}
-              docker push ${{secrets.USERNAME}}/portofolio:${{github.run_number}}
-              docker push ${{secrets.USERNAME}}/portofolio
-  deploy:
-    needs: build
-    runs-on: ubuntu-latest
-    steps:
-      - name: ssh to a server
-        uses: appleboy/ssh-action@v1
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials via OIDC
+        uses: aws-actions/configure-aws-credentials@v2
         with:
-          host: ${{ secrets.HOST }}
-          username: ${{ secrets.USERNAME1 }}
-          key: ${{ secrets.KEY }}
-          #port: ${{ secrets.PORT }}
-          script: |
-                    docker rm -f resume
-                    docker run -d --name resume -p 8080:5001 ${{secrets.USERNAME}}/portofolio:${{github.run_number}}
+          role-to-assume: ${{secrets.ROLE_ARN}}
+          aws-region: ${{vars.AWS_REGION}}
+
+      # - name: Login to Amazon ECR
+      #   id: login-ecr
+      #   uses: aws-actions/amazon-ecr-login@v1
+      
+      # - name: Build and Push Docker Image
+      #   run: |
+      #     IMAGE_URI="${{ steps.login-ecr.outputs.registry }}/portfolio"
+      #     docker build -t $IMAGE_URI:${{ github.run_number }} .
+      #     docker push $IMAGE_URI:${{ github.run_number }}
+      #     docker tag $IMAGE_URI:${{ github.run_number }} $IMAGE_URI:latest
+      #     docker push $IMAGE_URI:latest

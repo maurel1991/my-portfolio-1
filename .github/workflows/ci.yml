@@ -28,7 +28,7 @@ jobs:
       
       - name: Build and Push Docker Image
         run: |
-          IMAGE_URI="${{ steps.login-ecr.outputs.registry }}/portfolio"
+          IMAGE_URI="${{ steps.login-ecr.outputs.registry }}/my-portfolio"
           docker build -t $IMAGE_URI:${{ github.run_number }} .
           docker push $IMAGE_URI:${{ github.run_number }}
           docker tag $IMAGE_URI:${{ github.run_number }} $IMAGE_URI:latest

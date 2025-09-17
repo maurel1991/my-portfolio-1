@@ -66,7 +66,6 @@ jobs:
           host: ${{ secrets.EC2_HOST }}          # Public IP or DNS
           username: ${{ secrets.EC2_USER }}      # e.g., "ubuntu" or "ec2-user"
           key: ${{ secrets.EC2_SSH_KEY }}        # Private key from GitHub Secrets
-          #port: 22
           script: |
             IMAGE_URI=${{ needs.build.outputs.IMAGE_URI }}
             IMAGE_TAG=${{ github.run_number }}

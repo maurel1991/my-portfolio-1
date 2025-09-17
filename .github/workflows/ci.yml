@@ -65,7 +65,7 @@ jobs:
           key: ${{ secrets.EC2_SSH_KEY }}        # Private key (stored in GitHub Secrets)
           port: 22
           script: |
-            IMAGE_URI= ${{ needs.build.outputs.IMAGE_URI }}
+            IMAGE_URI=${{needs.build.outputs.IMAGE_URI }}
             IMAGE_TAG=${{ github.run_number }}
 
             # Login to ECR on EC2

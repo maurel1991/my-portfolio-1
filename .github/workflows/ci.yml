@@ -13,7 +13,7 @@ jobs:
       id-token: write
       contents: read
     outputs:
-      IMAGE_URI: ${{ steps.set-image-uri.outputs.IMAGE_URI }}
+      IMAGE_URI: ${{ secrets.AWS_IMAGE_URI }}
 
     steps:
       - name: Checkout code
@@ -31,13 +31,13 @@ jobs:
 
       - name: Build Docker Image
         run: |
-          IMAGE_URI="${{ steps.login-ecr.outputs.registry }}/my-portfolio"
+          IMAGE_URI="${{ secrets.AWS_IMAGE_URI }}/my-portfolio"
           docker build -t $IMAGE_URI:${{ github.run_number }} .
 
       - name: Scan Docker image with Trivy
         uses: aquasecurity/trivy-action@0.12.0
         with:
-          image-ref: ${{ steps.login-ecr.outputs.registry }}/my-portfolio:${{ github.run_number }}
+          image-ref: ${{ secrets.AWS_IMAGE_URI }}/my-portfolio:${{ github.run_number }}
           format: 'table'
           exit-code: '0'       # Do NOT fail pipeline on HIGH/CRITICAL
           ignore-unfixed: true
@@ -46,12 +46,12 @@ jobs:
 
       - name: Push image to Amazon ECR
         run: |
-          IMAGE_URI="${{ steps.login-ecr.outputs.registry }}/my-portfolio"
+          IMAGE_URI="${{ secrets.AWS_IMAGE_URI }}/my-portfolio"
           docker push $IMAGE_URI:${{ github.run_number }}
 
       - name: Set image URI output
         id: set-image-uri
-        run: echo "IMAGE_URI=${{ steps.login-ecr.outputs.registry }}/my-portfolio" >> $GITHUB_OUTPUT
+        run: echo "IMAGE_URI=${{ secrets.AWS_IMAGE_URI }}/my-portfolio" >> $GITHUB_OUTPUT
 
   deploy-ec2:
     runs-on: ubuntu-latest
@@ -67,7 +67,7 @@ jobs:
           username: ${{ secrets.EC2_USER }}      # e.g., "ubuntu" or "ec2-user"
           key: ${{ secrets.EC2_SSH_KEY }}        # Private key from GitHub Secrets
           script: |
-            IMAGE_URI="${{AWS_IMAGE_URI}}"
+            IMAGE_URI="${{ secrets.AWS_IMAGE_URI }}"
             IMAGE_TAG=${{ github.run_number }}
 
             # Authenticate to ECR

@@ -39,7 +39,7 @@ jobs:
         with:
           image-ref: ${{ steps.login-ecr.outputs.registry }}/my-portfolio:${{ github.run_number }}
           format: 'table'
-          exit-code: '0'       # Do NOT fail pipeline on HIGH/CRITICAL
+          exit-code: '1'       # Do NOT fail pipeline on HIGH/CRITICAL
           ignore-unfixed: true
           vuln-type: 'os,library'
           severity: 'CRITICAL,HIGH'

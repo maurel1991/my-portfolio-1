@@ -67,20 +67,21 @@ jobs:
           username: ${{ secrets.EC2_USER }}      # e.g., "ubuntu" or "ec2-user"
           key: ${{ secrets.EC2_SSH_KEY }}        # Private key from GitHub Secrets
           script: |
-            IMAGE_URI=${{ needs.build.outputs.IMAGE_URI }}
+            IMAGE_URI=296945066713.dkr.ecr.us-east-2.amazonaws.com/my-portfolio
             IMAGE_TAG=${{ github.run_number }}
 
-            # Login to ECR on EC2
-            aws ecr get-login-password --region ${{ vars.AWS_REGION }} | docker login --username AWS --password-stdin $IMAGE_URI
+            # Authenticate to ECR
+            aws ecr get-login-password --region us-east-2 | docker login --username AWS --password-stdin $IMAGE_URI
 
-            # Pull the latest image
+            # Pull new image
             docker pull $IMAGE_URI:$IMAGE_TAG
 
-            # Stop previous container (if any)
+            # Stop old container
             docker rm -f my-portfolio || true
 
             # Run new container
             docker run -d --name my-portfolio -p 8080:5001 $IMAGE_URI:$IMAGE_TAG
 
-            # Verify container is running
+            # Verify
             docker ps
+

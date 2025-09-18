@@ -46,12 +46,12 @@ jobs:
 
       - name: Push image to Amazon ECR
         run: |
-          IMAGE_URI="${{ secrets.AWS_IMAGE_URI }}/my-portfolio"
+          IMAGE_URI=${{ secrets.AWS_IMAGE_URI }}
           docker push $IMAGE_URI:${{ github.run_number }}
 
       - name: Set image URI output
         id: set-image-uri
-        run: echo "IMAGE_URI=${{ secrets.AWS_IMAGE_URI }}/my-portfolio" >> $GITHUB_OUTPUT
+        run: echo "IMAGE_URI=${{ secrets.AWS_IMAGE_URI }} >> $GITHUB_OUTPUT
 
   deploy-ec2:
     runs-on: ubuntu-latest

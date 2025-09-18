@@ -67,7 +67,7 @@ jobs:
           username: ${{ secrets.EC2_USER }}      # e.g., "ubuntu" or "ec2-user"
           key: ${{ secrets.EC2_SSH_KEY }}        # Private key from GitHub Secrets
           script: |
-            IMAGE_URI=${{AWS_IMAGE_URI}}
+            IMAGE_URI="${{AWS_IMAGE_URI}}"
             IMAGE_TAG=${{ github.run_number }}
 
             # Authenticate to ECR
